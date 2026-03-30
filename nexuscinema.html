@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusCinema</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080809;
+  --surface: #101013;
+  --surface2: #18181e;
+  --border: #252530;
+  --border2: #32323f;
+  --accent: #e84040;
+  --accent2: #ff6060;
+  --text: #ebebf5;
+  --muted: #64647a;
+  --dim: #333340;
+  --gold: #f0c040;
+  --radius: 10px;
+}
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── AUTH GATE ── */
+#auth-gate {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#auth-gate::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 45% at 20% 30%, rgba(232,64,64,0.10) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 50% at 80% 70%, rgba(232,64,64,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+#auth-gate::after {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.07) 2px, rgba(0,0,0,.07) 4px);
+  pointer-events: none;
+}
+.gate-box {
+  position: relative; z-index: 1;
+  text-align: center;
+  animation: gateIn .5s cubic-bezier(.22,1,.36,1);
+}
+@keyframes gateIn {
+  from { opacity:0; transform:translateY(30px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.gate-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 52px;
+  font-weight: 600;
+  letter-spacing: -.04em;
+  color: var(--accent);
+  text-shadow: 0 0 60px rgba(232,64,64,.4);
+  margin-bottom: 6px;
+}
+.gate-logo span { color: var(--muted); }
+.gate-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 36px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .06em;
+}
+.gate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 28px;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: background .15s, box-shadow .15s, transform .1s;
+  box-shadow: 0 8px 32px rgba(232,64,64,.3);
+  margin-bottom: 14px;
+}
+.gate-btn:hover { background: var(--accent2); box-shadow: 0 8px 40px rgba(232,64,64,.45); }
+.gate-btn:active { transform: scale(.97); }
+.gate-note {
+  font-size: 11px;
+  color: var(--dim);
+  font-family: 'JetBrains Mono', monospace;
+}
+.gate-note a { color: var(--muted); text-decoration: none; }
+.gate-note a:hover { color: var(--accent2); }
+
+/* AUTH REDIRECT ANIMATION */
+#auth-gate.redirecting .gate-box { animation: none; }
+.gate-loading {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+.gate-loading.show { display: flex; }
+.gate-spin {
+  width: 16px; height: 16px;
+  border: 2px solid var(--dim);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── NAV ── */
+#nav {
+  height: 56px;
+  background: rgba(8,8,9,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+.nav-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: -.03em;
+  text-shadow: 0 0 20px rgba(232,64,64,.3);
+}
+.nav-logo span { color: var(--muted); }
+.nav-badge {
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: rgba(240,192,64,.12);
+  border: 1px solid rgba(240,192,64,.25);
+  color: var(--gold);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .06em;
+}
+.nav-links {
+  display: flex; gap: 2px;
+}
+.nav-link {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.nav-link:hover { background: var(--surface2); color: var(--text); }
+.nav-link.active { color: var(--text); background: var(--surface2); }
+.nav-spacer { flex: 1; }
+.nav-user {
+  display: flex; align-items: center; gap: 8px;
+}
+.nav-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: #fff;
+}
+.nav-username {
+  font-size: 12px; color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── HERO ── */
+#hero {
+  background: linear-gradient(180deg, rgba(232,64,64,.06) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 40px 32px 36px;
+  position: relative;
+  overflow: hidden;
+}
+#hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(232,64,64,.015) 80px, rgba(232,64,64,.015) 81px);
+  pointer-events: none;
+}
+.hero-title {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.hero-title span { color: var(--accent); }
+.hero-sub {
+  font-size: 13px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+/* WIP Banner */
+.wip-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 8px 16px;
+  background: rgba(240,192,64,.08);
+  border: 1px solid rgba(240,192,64,.2);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--gold);
+  font-family: 'JetBrains Mono', monospace;
+}
+.wip-pulse {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gold);
+  animation: blink 1.5s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+/* ── CONTENT ── */
+#content {
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.section-title {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+.section-line { flex: 1; height: 1px; background: var(--border); }
+.series-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px;
+  margin-bottom: 40px;
+}
+.series-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .18s, transform .15s, box-shadow .18s;
+  position: relative;
+}
+.series-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(232,64,64,.18);
+}
+.series-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-size: 56px;
+}
+.series-poster-bg {
+  position: absolute; inset: 0;
+  opacity: .18;
+  font-size: 120px;
+  display: flex; align-items: center; justify-content: center;
+  filter: blur(8px);
+  pointer-events: none;
+}
+.series-poster-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(8,8,9,.95) 100%);
+}
+.series-poster-badge {
+  position: absolute; top: 10px; left: 10px;
+  font-size: 9px; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .08em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: #fff;
+}
+.series-poster-drive {
+  position: absolute; bottom: 10px; right: 10px;
+  font-size: 9px;
+  font-family: 'JetBrains Mono', monospace;
+  color: rgba(255,255,255,.4);
+  display: flex; align-items: center; gap: 4px;
+}
+.series-info {
+  padding: 12px 13px 14px;
+  border-top: 1px solid var(--border);
+}
+.series-name {
+  font-size: 13px; font-weight: 600;
+  color: var(--text); margin-bottom: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.series-meta {
+  font-size: 10px; color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex; align-items: center; gap: 6px;
+}
+.series-open-btn {
+  display: none; /* shown on hover via JS */
+  position: absolute; inset: 0;
+  align-items: center; justify-content: center;
+  background: rgba(0,0,0,.45);
+  backdrop-filter: blur(2px);
+  z-index: 2;
+  animation: fadeIn .12s ease;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.series-play-ring {
+  width: 58px; height: 58px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.8);
+  background: rgba(232,64,64,.85);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: #fff;
+  box-shadow: 0 0 30px rgba(232,64,64,.5);
+  transition: transform .15s;
+}
+.series-card:hover .series-play-ring { transform: scale(1.08); }
+
+/* Add series modal */
+#add-modal {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 7000;
+  align-items: center;
+  justify-content: center;
+}
+#add-modal.open { display: flex; }
+.add-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 28px 32px;
+  width: 440px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.7);
+}
+.add-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 18px; }
+.add-field { margin-bottom: 14px; }
+.add-field label {
+  display: block;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 5px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.add-field input, .add-field select {
+  width: 100%; height: 40px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 0 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+}
+.add-field input:focus { border-color: var(--accent); }
+.add-actions { display: flex; gap: 8px; margin-top: 8px; justify-content: flex-end; }
+.add-btn-cancel {
+  padding: 8px 16px; border-radius: 7px;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; cursor: pointer; transition: all .15s;
+}
+.add-btn-cancel:hover { background: var(--surface2); color: var(--text); }
+.add-btn-add {
+  padding: 8px 16px; border-radius: 7px;
+  background: var(--accent); border: none;
+  color: #fff; font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: background .15s;
+}
+.add-btn-add:hover { background: var(--accent2); }
+
+/* bottom bar */
+#bottombar {
+  height: 24px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: auto;
+}
+.bb-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- AUTH GATE -->
+<div id="auth-gate">
+  <div class="gate-box">
+    <div class="gate-logo">nexus<span>.</span>cinema</div>
+    <div class="gate-sub">PRIVATE STREAMING · MEMBERS ONLY</div>
+    <button class="gate-btn" onclick="startAuthRedirect()">
+      <span>🔑</span> SIGN IN WITH NEXUS
+    </button>
+    <div class="gate-note">
+      Uses <a href="browser.html">b.rowser</a> authentication · <a href="#">Learn more</a>
+    </div>
+    <div class="gate-loading" id="gate-loading">
+      <div class="gate-spin"></div>
+      <span id="gate-loading-text">Authenticating…</span>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div id="nav">
+  <div class="nav-logo">nexus<span>.</span>cinema</div>
+  <div class="nav-badge">W.I.P</div>
+  <div class="nav-spacer"></div>
+  <div class="nav-links">
+    <div class="nav-link active">Home</div>
+    <div class="nav-link">My List</div>
+    <div class="nav-link" onclick="openAddModal()">+ Add Series</div>
+  </div>
+  <div class="nav-user" id="nav-user">
+    <div class="nav-avatar" id="nav-avatar">?</div>
+    <span class="nav-username" id="nav-username">guest</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<div id="hero">
+  <div class="hero-title">Welcome to <span>NexusCinema</span></div>
+  <div class="hero-sub">// Your private anime library · Google Drive folders</div>
+  <div class="wip-banner">
+    <div class="wip-pulse"></div>
+    ANIME STREAMING · Click any series to open its Drive folder
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div id="content">
+  <div class="section-header">
+    <div class="section-title">ANIME LIBRARY</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="series-grid" id="series-grid">
+    <!-- Rendered by JS -->
+  </div>
+</div>
+
+<!-- ADD SERIES MODAL -->
+<div id="add-modal" onclick="closeAddOutside(event)">
+  <div class="add-box">
+    <div class="add-title">📺 Add Series</div>
+    <div class="add-field">
+      <label>Video Title</label>
+      <input id="add-title" placeholder="e.g. One Piece" />
+    </div>
+    <div class="add-field">
+      <label>Google Drive Link or File ID</label>
+      <input id="add-url" placeholder="https://drive.google.com/drive/folders/…" />
+    </div>
+    <div class="add-field">
+      <label>Genre / Tag</label>
+      <select id="add-cat">
+        <option value="Shonen">Shonen</option>
+        <option value="Action">Action</option>
+        <option value="Sports">Sports</option>
+        <option value="Horror">Horror</option>
+        <option value="Slice of Life">Slice of Life</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="add-field">
+      <label>Description (optional)</label>
+      <input id="add-desc" placeholder="e.g. Pirate adventure anime — Eiichiro Oda" />
+    </div>
+    <div class="add-actions">
+      <button class="add-btn-cancel" onclick="closeAddModal()">Cancel</button>
+      <button class="add-btn-add" onclick="addSeries()">Add Series</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div id="bottombar">
+  <div class="bb-dot"></div>
+  <span>NexusCinema · W.I.P</span>
+  <span style="margin-left:auto" id="video-count">0 videos loaded</span>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// AUTH + SERIES SYSTEM — NexusCinema
+// ══════════════════════════════════════
+
+const CINEMA_KEY = 'nexuscinema_auth';
+
+// ── BUILT-IN SERIES (from Drive folder links) ──
+const BUILTIN_SERIES = [
+  {
+    id: 'onepiece',
+    name: 'One Piece',
+    genre: 'Shonen',
+    emoji: '🏴‍☠️',
+    desc: 'Pirate adventure — Eiichiro Oda',
+    folder: 'https://drive.google.com/drive/folders/1VdoAVMV9ojCefzkVMsXB3ms5TCEcgxoC',
+  },
+  {
+    id: 'jjk',
+    name: 'Jujutsu Kaisen',
+    genre: 'Action',
+    emoji: '🩸',
+    desc: 'Cursed energy battles — Gege Akutami',
+    folder: 'https://drive.google.com/drive/folders/1lSJjypL4qSxFDwK0gG472xb8stEQY9ML',
+  },
+  {
+    id: 'bluelock',
+    name: 'Blue Lock',
+    genre: 'Sports',
+    emoji: '⚽',
+    desc: 'Elite striker training program',
+    folder: 'https://drive.google.com/drive/folders/1Irj-j3odXWd9hZzKNYNv3TehTstwEc4F',
+  },
+  {
+    id: 'jojo',
+    name: "JoJo's Bizarre Adventure",
+    genre: 'Action',
+    emoji: '⭐',
+    desc: 'The Joestar bloodline — Hirohiko Araki',
+    folder: 'https://drive.google.com/drive/folders/1923Vg-QJchH2RdSseJ4n6uzUyy7X7PZQ',
+  },
+  {
+    id: 'tokyoghoul',
+    name: 'Tokyo Ghoul',
+    genre: 'Horror',
+    emoji: '👁️',
+    desc: 'Ghouls among humans — Sui Ishida',
+    folder: 'https://drive.google.com/drive/folders/1_62VQpKyYsI5vrDbZ2qUgJFAAkNwAum4',
+  },
+  {
+    id: 'dandadan',
+    name: 'DanDaDan',
+    genre: 'Action',
+    emoji: '👻',
+    desc: 'Aliens, ghosts & supernatural chaos — Yukinobu Tatsu',
+    folder: 'https://drive.google.com/drive/folders/1A0DRGMGOoUhNU20q_3FKKxhnbZUqdbKR',
+  },
+  {
+    id: 'sakamotodays',
+    name: 'Sakamoto Days',
+    genre: 'Action',
+    emoji: '🔫',
+    desc: 'Retired hitman living a quiet life — Yuto Suzuki',
+    folder: 'https://drive.google.com/drive/folders/1sBF2ZwNja3AG22EYugk2jJlLVmNWGZoa',
+  },
+  {
+    id: 'naruto',
+    name: 'Naruto',
+    genre: 'Shonen',
+    emoji: '🍥',
+    desc: 'Ninja who dreams of becoming Hokage — Masashi Kishimoto',
+    folder: 'https://drive.google.com/drive/folders/1pdu3zkAPeF4o-tyPe-HsKhAiIZxBrqKS',
+  },
+  {
+    id: 'chainsawman',
+    name: 'Chainsaw Man',
+    genre: 'Action',
+    emoji: '⛓️',
+    desc: 'Devil hunting for a simple life — Tatsuki Fujimoto',
+    folder: 'https://drive.google.com/drive/folders/13ZwI4Ro3iGhdAkrrc-_fy66r10v61y6A',
+  },
+  {
+    id: 'demonslayer',
+    name: 'Demon Slayer',
+    genre: 'Shonen',
+    emoji: '🗡️',
+    desc: 'Slaying demons to save his sister — Koyoharu Gotouge',
+    folder: 'https://drive.google.com/drive/folders/1DBx645dx8kca0OcSp5U1RqSo7EPjnZF4',
+  },
+  {
+    id: 'sololeveling',
+    name: 'Solo Leveling',
+    genre: 'Action',
+    emoji: '⚔️',
+    desc: 'Weakest hunter rises to the strongest — Chugong',
+    folder: 'https://drive.google.com/drive/folders/1E6FjKpTju8Ebn_ZYTMRWn2v2tiPRwISy',
+  },
+];
+
+// User-added series from localStorage
+let userSeries = JSON.parse(localStorage.getItem('nexuscinema_series') || '[]');
+
+function allSeries() {
+  return [...BUILTIN_SERIES, ...userSeries];
+}
+
+// ── GENRE COLOR MAP ──
+const GENRE_COLOR = {
+  'Shonen':       { bg: 'rgba(232,64,64,.15)',  border: 'rgba(232,64,64,.35)',  text: '#ff7070' },
+  'Action':       { bg: 'rgba(255,120,30,.15)', border: 'rgba(255,120,30,.35)', text: '#ff904a' },
+  'Sports':       { bg: 'rgba(64,200,100,.12)', border: 'rgba(64,200,100,.3)',  text: '#50e080' },
+  'Horror':       { bg: 'rgba(160,40,200,.15)', border: 'rgba(160,40,200,.3)',  text: '#c060ff' },
+  'Slice of Life':{ bg: 'rgba(64,160,255,.12)', border: 'rgba(64,160,255,.3)',  text: '#60b8ff' },
+  'Other':        { bg: 'rgba(100,100,120,.15)',border: 'rgba(100,100,120,.3)', text: '#8888aa' },
+};
+
+// ── AUTH ──
+function startAuthRedirect() {
+  const loading = document.getElementById('gate-loading');
+  const loadingText = document.getElementById('gate-loading-text');
+  loading.classList.add('show');
+  loadingText.textContent = 'Redirecting to b.rowser auth…';
+  setTimeout(() => {
+    loadingText.textContent = 'Connecting to auth server…';
+    setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      const authToken = params.get('auth');
+      const authUser = params.get('user');
+      if (authToken && authUser) {
+        completeAuth(authUser, authToken);
+      } else {
+        const returnUrl = encodeURIComponent(window.location.href.split('?')[0] + '?from=cinema');
+        window.location.href = 'browser.html?redirect=' + returnUrl;
+      }
+    }, 800);
+  }, 600);
+}
+
+function completeAuth(username, token) {
+  const session = { username, token, ts: Date.now() };
+  localStorage.setItem(CINEMA_KEY, JSON.stringify(session));
+  const gate = document.getElementById('auth-gate');
+  gate.style.transition = 'opacity .5s ease, transform .5s ease';
+  gate.style.opacity = '0';
+  gate.style.transform = 'scale(1.02)';
+  setTimeout(() => {
+    gate.style.display = 'none';
+    document.getElementById('nav-avatar').textContent = username[0].toUpperCase();
+    document.getElementById('nav-username').textContent = username;
+    renderSeries();
+  }, 500);
+}
+
+function checkExistingAuth() {
+  const params = new URLSearchParams(window.location.search);
+  const saved = localStorage.getItem(CINEMA_KEY);
+  if (saved) {
+    try {
+      const s = JSON.parse(saved);
+      if (Date.now() - s.ts < 7200000) { completeAuth(s.username, s.token); return; }
+    } catch(e) {}
+  }
+  const authToken = params.get('auth');
+  const authUser = params.get('user');
+  if (authToken && authUser) { completeAuth(authUser, authToken); return; }
+  if (params.get('from')) {
+    document.getElementById('gate-loading').classList.add('show');
+    document.getElementById('gate-loading-text').textContent = 'Auth returned — sign in required.';
+  }
+}
+
+// ── RENDER SERIES GRID ──
+function renderSeries() {
+  const grid = document.getElementById('series-grid');
+  const list = allSeries();
+  grid.innerHTML = list.map(s => seriesCardHTML(s)).join('');
+  document.getElementById('video-count').textContent =
+    list.length + ' series · ' + BUILTIN_SERIES.length + ' built-in';
+}
+
+function seriesCardHTML(s) {
+  const gc = GENRE_COLOR[s.genre] || GENRE_COLOR['Other'];
+  return `<div class="series-card" onclick="openDriveFolder('${escHtml(s.folder)}', '${escHtml(s.name)}')">
+    <div class="series-poster">
+      <div class="series-poster-bg">${s.emoji}</div>
+      <div style="position:relative;z-index:1;font-size:52px">${s.emoji}</div>
+      <div class="series-poster-overlay"></div>
+      <div class="series-poster-badge" style="background:${gc.bg};border:1px solid ${gc.border};color:${gc.text}">${s.genre}</div>
+      <div class="series-poster-drive">📁 Drive</div>
+      <div class="series-open-btn" id="hover-${s.id}">
+        <div class="series-play-ring">▶</div>
+      </div>
+    </div>
+    <div class="series-info">
+      <div class="series-name" title="${escHtml(s.name)}">${escHtml(s.name)}</div>
+      <div class="series-meta">${escHtml(s.desc)}</div>
+    </div>
+  </div>`;
+}
+
+// ── OPEN DRIVE FOLDER ──
+// Route through b.rowser so the folder loads inside the browser interface
+function openDriveFolder(url, name) {
+  window.location.href = 'browser.html?url=' + encodeURIComponent(url);
+}
+
+// ── ADD SERIES MODAL ──
+function openAddModal()  { document.getElementById('add-modal').classList.add('open'); }
+function closeAddModal() { document.getElementById('add-modal').classList.remove('open'); }
+function closeAddOutside(e) { if (e.target === document.getElementById('add-modal')) closeAddModal(); }
+
+function addSeries() {
+  const name   = document.getElementById('add-title').value.trim();
+  const folder = document.getElementById('add-url').value.trim();
+  const genre  = document.getElementById('add-cat').value;
+  const desc   = document.getElementById('add-desc').value.trim();
+  if (!name)   { alert('Please enter a series name.'); return; }
+  if (!folder) { alert('Please enter a Google Drive folder link.'); return; }
+  const entry = {
+    id: 'user_' + Date.now(),
+    name, genre, emoji: '🎬',
+    desc: desc || genre + ' anime',
+    folder,
+  };
+  userSeries.push(entry);
+  localStorage.setItem('nexuscinema_series', JSON.stringify(userSeries));
+  renderSeries();
+  closeAddModal();
+  ['add-title','add-url','add-desc'].forEach(id => document.getElementById(id).value = '');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── INIT ──
+checkExistingAuth();
+</script>
+</body>
+</html>

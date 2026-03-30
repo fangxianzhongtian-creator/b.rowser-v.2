@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khan Academy</title>
+<link rel="icon" href="https://cdn.kastatic.org/images/favicon.ico" id="page-favicon">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d0d0f; --surface: #141417; --surface2: #1c1c21; --surface3: #222228;
+  --border: #2a2a32; --border2: #38383f;
+  --accent: #5b6af0; --accent2: #7b8cf5;
+  --text: #e8e8f0; --muted: #6b6b7a; --dim: #3a3a45;
+  --red: #e05a5a; --yellow: #e0c45a; --green: #5ae08a;
+  --radius: 10px;
+}
+body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* TOPBAR */
+#topbar {
+  height: 48px; background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 16px; gap: 12px;
+  flex-shrink: 0; position: sticky; top: 0; z-index: 50;
+}
+.topbar-logo { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; color: var(--accent); }
+.topbar-logo span { color: var(--muted); font-weight: 300; }
+#topbar-tabs { display: flex; gap: 2px; flex: 1; overflow-x: auto; scrollbar-width: none; }
+.tb-tab {
+  height: 32px; padding: 0 14px; border-radius: 6px; background: transparent;
+  border: 1px solid transparent; font-size: 12px; color: var(--muted); cursor: pointer;
+  white-space: nowrap; display: flex; align-items: center; gap: 6px; transition: all .15s;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.tb-tab:hover { background: var(--surface2); color: var(--text); }
+.tb-tab.active { background: var(--surface2); border-color: var(--border); color: var(--text); }
+.topbar-actions { display: flex; gap: 6px; margin-left: auto; }
+.icon-btn {
+  width: 32px; height: 32px; border-radius: 7px; background: transparent; border: none;
+  color: var(--muted); font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: background .15s, color .15s;
+}
+.icon-btn:hover { background: var(--surface2); color: var(--text); }
+
+/* EMERGENCY BUTTON */
+#emergency-btn {
+  height: 32px; padding: 0 14px; border-radius: 7px;
+  background: rgba(224,90,90,0.12); border: 1px solid rgba(224,90,90,0.3);
+  color: var(--red); font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 500; letter-spacing: .06em;
+  cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all .15s;
+}
+#emergency-btn:hover { background: rgba(224,90,90,0.22); border-color: var(--red); box-shadow: 0 0 12px rgba(224,90,90,0.2); }
+
+/* CONTENT */
+#content { flex: 1; padding: 32px; max-width: 1100px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; }
+.page { display: none; flex: 1; }
+.page.active { display: block; }
+#page-skipvids.active { display: flex; }
+.hero {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 48px 40px; margin-bottom: 28px; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(91,106,240,0.07) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(91,106,240,0.12); border: 1px solid rgba(91,106,240,0.25);
+  border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--accent2);
+  font-family: 'JetBrains Mono', monospace; letter-spacing: .06em; margin-bottom: 16px;
+}
+.hero h1 { font-size: 32px; font-weight: 600; color: var(--text); margin-bottom: 10px; letter-spacing: -.02em; }
+.hero p { font-size: 14px; color: var(--muted); max-width: 500px; line-height: 1.7; }
+.section-title {
+  font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 14px; font-family: 'JetBrains Mono', monospace;
+}
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; cursor: pointer; transition: all .15s; position: relative; overflow: hidden;
+}
+.card:hover { border-color: var(--border2); background: var(--surface2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.card-icon { font-size: 24px; margin-bottom: 10px; }
+.card-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+.card-sub { font-size: 11px; color: var(--muted); }
+.card-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--border); }
+.card-progress-fill { height: 100%; background: var(--accent); }
+.progress-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+.progress-item {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px; display: flex; align-items: center; gap: 14px; transition: border-color .15s;
+}
+.progress-item:hover { border-color: var(--border2); }
+.pi-icon { font-size: 20px; width: 36px; text-align: center; }
+.pi-info { flex: 1; }
+.pi-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 5px; }
+.pi-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; }
+.pi-bar { height: 100%; background: var(--accent); border-radius: 2px; }
+.pi-pct { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+/* SETTINGS OVERLAY */
+#settings-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); z-index: 200;
+  align-items: center; justify-content: center; backdrop-filter: blur(4px);
+}
+#settings-overlay.open { display: flex; }
+#settings-panel {
+  background: var(--surface); border: 1px solid var(--border2); border-radius: 16px;
+  width: 520px; max-height: 82vh; overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+  animation: panelIn .2s cubic-bezier(.22,1,.36,1);
+}
+@keyframes panelIn { from { opacity:0; transform:scale(.95) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+.sp-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.sp-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.sp-close { width: 28px; height: 28px; border-radius: 6px; background: transparent; border: none; color: var(--muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+.sp-close:hover { background: var(--surface2); color: var(--text); }
+.sp-section { padding: 18px 24px; border-bottom: 1px solid var(--border); }
+.sp-section:last-child { border-bottom: none; }
+.sp-section-title { font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; font-family: 'JetBrains Mono', monospace; }
+.sp-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 12px; }
+.sp-row:last-child { margin-bottom: 0; }
+.sp-label { font-size: 13px; color: var(--text); }
+.sp-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.sp-input {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 7px;
+  padding: 0 10px; height: 32px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--text); outline: none; min-width: 0; width: 220px; transition: border-color .15s;
+  caret-color: var(--accent); flex-shrink: 0;
+}
+.sp-input:focus { border-color: var(--accent); }
+.sp-select {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 7px;
+  padding: 0 10px; height: 32px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--text); outline: none; width: 220px; cursor: pointer; flex-shrink: 0; transition: border-color .15s;
+}
+.sp-select:focus { border-color: var(--accent); }
+.toggle {
+  width: 38px; height: 20px; background: var(--dim); border-radius: 10px;
+  cursor: pointer; position: relative; transition: background .2s; flex-shrink: 0;
+}
+.toggle.on { background: var(--accent); }
+.toggle::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 14px; height: 14px; background: #fff; border-radius: 50%;
+  transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.toggle.on::after { transform: translateX(18px); }
+#cloak-preview {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 14px; margin-top: 12px; font-size: 11px; color: var(--muted);
+  font-family: 'JetBrains Mono', monospace; display: flex; align-items: center; gap: 10px;
+}
+#cloak-preview img { width: 16px; height: 16px; border-radius: 3px; }
+#cloak-title-preview { color: var(--text); }
+.sp-save {
+  margin: 0 24px 20px; height: 38px; background: var(--accent); border: none; border-radius: 8px;
+  color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500;
+  letter-spacing: .06em; cursor: pointer; width: calc(100% - 48px); transition: background .15s;
+}
+.sp-save:hover { background: var(--accent2); }
+.hotkey { background: var(--surface3); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+
+/* SKIPVIDS PAGE */
+#page-skipvids { height: calc(100vh - 48px); display: none; flex-direction: column; margin: -32px; }
+#page-skipvids.active { display: flex; }
+#sv-bar {
+  height: 36px; flex-shrink: 0;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 14px; gap: 10px;
+}
+#sv-bar-title {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); flex: 1;
+}
+.sv-btn {
+  height: 24px; padding: 0 12px; border-radius: 5px;
+  border: 1px solid var(--border); background: transparent;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+  letter-spacing: .06em; cursor: pointer; transition: all .14s; color: var(--muted);
+}
+.sv-btn:hover { border-color: var(--accent); color: var(--accent); }
+#sv-iframe-wrap { flex: 1; position: relative; overflow: hidden; }
+#sv-iframe {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  border: none; background: #fff; display: block;
+}
+#sv-fallback {
+  display: none; position: absolute; inset: 0;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; text-align: center; padding: 40px;
+  background: var(--bg);
+}
+#sv-fallback.show { display: flex; }
+.svf-icon { font-size: 3rem; }
+.svf-title { font-size: 1rem; font-weight: 600; color: var(--text); }
+.svf-sub { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); line-height: 1.9; max-width: 440px; }
+.svf-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.svf-btn {
+  height: 36px; padding: 0 18px; border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+  letter-spacing: .06em; cursor: pointer; transition: all .15s; color: #fff;
+  border: none;
+}
+.svf-btn-primary { background: var(--accent); }
+.svf-btn-primary:hover { background: var(--accent2); }
+.svf-btn-secondary { background: transparent; border: 1px solid var(--border2); color: var(--muted); }
+.svf-btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px;
+  padding: 12px 18px; font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--green);
+  z-index: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  transform: translateY(80px); opacity: 0; transition: transform .3s cubic-bezier(.22,1,.36,1), opacity .3s;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="topbar-logo">edu<span>.app</span></div>
+  <div id="topbar-tabs">
+    <div class="tb-tab active" onclick="switchPage('home',this)">🏠 Home</div>
+    <div class="tb-tab" onclick="switchPage('math',this)">📐 Math</div>
+    <div class="tb-tab" onclick="switchPage('science',this)">🔬 Science</div>
+    <div class="tb-tab" onclick="switchPage('history',this)">📜 History</div>
+    <div class="tb-tab" onclick="switchPage('skipvids',this)">📺 SkipVids</div>
+  </div>
+  <div class="topbar-actions">
+    <button id="emergency-btn" onclick="doEmergency()" title="Emergency redirect (Alt+E)">⚡ ESC</button>
+    <button class="icon-btn" onclick="openSettings()" title="Settings (Alt+S)">⚙</button>
+  </div>
+</div>
+
+<div id="content">
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-tag">✦ Free Learning Platform</div>
+      <h1>Welcome back, learner</h1>
+      <p>Pick up where you left off or explore something new. All courses are free, forever.</p>
+    </div>
+    <div class="section-title">Continue Learning</div>
+    <div class="progress-list">
+      <div class="progress-item"><div class="pi-icon">📐</div><div class="pi-info"><div class="pi-title">Algebra II — Quadratic Functions</div><div class="pi-bar-wrap"><div class="pi-bar" style="width:68%"></div></div></div><div class="pi-pct">68%</div></div>
+      <div class="progress-item"><div class="pi-icon">⚗️</div><div class="pi-info"><div class="pi-title">Chemistry — Periodic Table & Bonding</div><div class="pi-bar-wrap"><div class="pi-bar" style="width:41%"></div></div></div><div class="pi-pct">41%</div></div>
+      <div class="progress-item"><div class="pi-icon">🌍</div><div class="pi-info"><div class="pi-title">World History — Industrial Revolution</div><div class="pi-bar-wrap"><div class="pi-bar" style="width:83%"></div></div></div><div class="pi-pct">83%</div></div>
+    </div>
+    <div class="section-title">Explore Subjects</div>
+    <div class="card-grid">
+      <div class="card" onclick="switchPage('math',document.querySelectorAll('.tb-tab')[1])"><div class="card-icon">📐</div><div class="card-title">Mathematics</div><div class="card-sub">Algebra, Calculus, Stats</div><div class="card-progress"><div class="card-progress-fill" style="width:68%"></div></div></div>
+      <div class="card" onclick="switchPage('science',document.querySelectorAll('.tb-tab')[2])"><div class="card-icon">🔬</div><div class="card-title">Science</div><div class="card-sub">Physics, Chemistry, Bio</div><div class="card-progress"><div class="card-progress-fill" style="width:41%"></div></div></div>
+      <div class="card" onclick="switchPage('history',document.querySelectorAll('.tb-tab')[3])"><div class="card-icon">📜</div><div class="card-title">History</div><div class="card-sub">World, US, Ancient</div><div class="card-progress"><div class="card-progress-fill" style="width:83%"></div></div></div>
+      <div class="card"><div class="card-icon">💻</div><div class="card-title">Computing</div><div class="card-sub">CS, Programming, AI</div><div class="card-progress"><div class="card-progress-fill" style="width:22%"></div></div></div>
+      <div class="card"><div class="card-icon">📖</div><div class="card-title">Literature</div><div class="card-sub">Reading, Writing, Grammar</div><div class="card-progress"><div class="card-progress-fill" style="width:55%"></div></div></div>
+      <div class="card"><div class="card-icon">🎨</div><div class="card-title">Arts</div><div class="card-sub">Music, Visual Art, Film</div><div class="card-progress"><div class="card-progress-fill" style="width:10%"></div></div></div>
+    </div>
+  </div>
+  <!-- MATH -->
+  <div class="page" id="page-math">
+    <div class="hero"><div class="hero-tag">📐 Mathematics</div><h1>Mathematics</h1><p>From basic arithmetic to multivariable calculus — build your skills step by step.</p></div>
+    <div class="section-title">Courses</div>
+    <div class="card-grid">
+      <div class="card"><div class="card-icon">➕</div><div class="card-title">Pre-Algebra</div><div class="card-sub">Foundations</div></div>
+      <div class="card"><div class="card-icon">🔢</div><div class="card-title">Algebra I</div><div class="card-sub">Equations & Graphs</div></div>
+      <div class="card"><div class="card-icon">📊</div><div class="card-title">Algebra II</div><div class="card-sub">Polynomials & More</div></div>
+      <div class="card"><div class="card-icon">📐</div><div class="card-title">Geometry</div><div class="card-sub">Proofs & Shapes</div></div>
+      <div class="card"><div class="card-icon">∞</div><div class="card-title">Calculus</div><div class="card-sub">Limits & Derivatives</div></div>
+      <div class="card"><div class="card-icon">📉</div><div class="card-title">Statistics</div><div class="card-sub">Data & Probability</div></div>
+    </div>
+  </div>
+  <!-- SCIENCE -->
+  <div class="page" id="page-science">
+    <div class="hero"><div class="hero-tag">🔬 Science</div><h1>Science</h1><p>Explore the natural world through physics, chemistry, biology, and earth science.</p></div>
+    <div class="section-title">Courses</div>
+    <div class="card-grid">
+      <div class="card"><div class="card-icon">⚛️</div><div class="card-title">Physics</div><div class="card-sub">Motion & Forces</div></div>
+      <div class="card"><div class="card-icon">⚗️</div><div class="card-title">Chemistry</div><div class="card-sub">Atoms & Reactions</div></div>
+      <div class="card"><div class="card-icon">🧬</div><div class="card-title">Biology</div><div class="card-sub">Cells & Genetics</div></div>
+      <div class="card"><div class="card-icon">🌍</div><div class="card-title">Earth Science</div><div class="card-sub">Geology & Climate</div></div>
+      <div class="card"><div class="card-icon">🌌</div><div class="card-title">Astronomy</div><div class="card-sub">Space & Cosmology</div></div>
+      <div class="card"><div class="card-icon">🌊</div><div class="card-title">Oceanography</div><div class="card-sub">Seas & Currents</div></div>
+    </div>
+  </div>
+  <!-- HISTORY -->
+  <div class="page" id="page-history">
+    <div class="hero"><div class="hero-tag">📜 History</div><h1>History</h1><p>Understand the past to navigate the present. Civilizations, revolutions, and ideas.</p></div>
+    <div class="section-title">Courses</div>
+    <div class="card-grid">
+      <div class="card"><div class="card-icon">🏛️</div><div class="card-title">Ancient Civilizations</div><div class="card-sub">Egypt, Greece, Rome</div></div>
+      <div class="card"><div class="card-icon">⚔️</div><div class="card-title">Medieval History</div><div class="card-sub">Middle Ages</div></div>
+      <div class="card"><div class="card-icon">🚢</div><div class="card-title">Age of Exploration</div><div class="card-sub">1400–1700</div></div>
+      <div class="card"><div class="card-icon">🏭</div><div class="card-title">Industrial Revolution</div><div class="card-sub">1760–1840</div></div>
+      <div class="card"><div class="card-icon">🌐</div><div class="card-title">World Wars</div><div class="card-sub">20th Century</div></div>
+      <div class="card"><div class="card-icon">🗽</div><div class="card-title">US History</div><div class="card-sub">Founding to Present</div></div>
+    </div>
+  </div>
+
+  <!-- SKIPVIDS -->
+  <div class="page" id="page-skipvids">
+    <div id="sv-bar">
+      <span id="sv-bar-title">📺 skipvids.com — embedded viewer</span>
+      <button class="sv-btn" onclick="svFullscreen()">⛶ FULLSCREEN</button>
+      <button class="sv-btn" onclick="svReload()">⟳ RELOAD</button>
+      <button class="sv-btn" onclick="svOpenDirect()" style="border-color:rgba(91,106,240,.4);color:var(--accent2)">↗ OPEN IN b.rowser</button>
+    </div>
+    <div id="sv-iframe-wrap">
+      <iframe
+        id="sv-iframe"
+        src="https://skipvids.com/"
+        allow="autoplay; fullscreen; clipboard-read; clipboard-write; encrypted-media; picture-in-picture"
+        referrerpolicy="no-referrer"
+      ></iframe>
+      <div id="sv-fallback">
+        <div class="svf-icon">🚫</div>
+        <div class="svf-title">skipvids.com blocked direct embedding</div>
+        <div class="svf-sub">
+          The site sends an <code>X-Frame-Options</code> or <code>Content-Security-Policy: frame-ancestors</code>
+          header preventing iframe embedding — enforced by the browser, cannot be bypassed from HTML alone.<br><br>
+          Use one of these methods:
+        </div>
+        <div class="svf-actions">
+          <button class="svf-btn svf-btn-primary" onclick="svOpenBrowser()">▶ Open in b.rowser tab</button>
+          <button class="svf-btn svf-btn-secondary" onclick="svOpenProxy()">🔀 Try via Proxy</button>
+          <button class="svf-btn svf-btn-secondary" onclick="svOpenDirect()">↗ New tab</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SETTINGS -->
+<div id="settings-overlay" onclick="closeSettingsOutside(event)">
+  <div id="settings-panel">
+    <div class="sp-header">
+      <div class="sp-title">⚙ Settings</div>
+      <button class="sp-close" onclick="closeSettings()">✕</button>
+    </div>
+    <!-- TAB CLOAKING -->
+    <div class="sp-section">
+      <div class="sp-section-title">🎭 Tab Cloaking</div>
+      <div class="sp-row">
+        <div><div class="sp-label">Enable Cloaking</div><div class="sp-desc">Changes tab title & favicon to disguise this page</div></div>
+        <div class="toggle" id="cloak-toggle" onclick="toggleCloak()"></div>
+      </div>
+      <div class="sp-row">
+        <div><div class="sp-label">Tab Title</div><div class="sp-desc">Text shown in the browser tab</div></div>
+        <input class="sp-input" id="cloak-title-input" type="text" value="Khan Academy" oninput="updateCloakPreview()" />
+      </div>
+      <div class="sp-row">
+        <div><div class="sp-label">Favicon Preset</div><div class="sp-desc">Icon shown next to the title</div></div>
+        <select class="sp-select" id="cloak-favicon-select" onchange="updateCloakPreview()">
+          <option value="https://cdn.kastatic.org/images/favicon.ico">Khan Academy</option>
+          <option value="https://www.google.com/favicon.ico">Google</option>
+          <option value="https://ssl.gstatic.com/classroom/favicon.png">Google Classroom</option>
+          <option value="https://www.wikipedia.org/favicon.ico">Wikipedia</option>
+          <option value="https://outlook.live.com/favicon.ico">Outlook</option>
+          <option value="custom">Custom URL…</option>
+        </select>
+      </div>
+      <input class="sp-input" id="cloak-favicon-custom" type="text" placeholder="https://example.com/favicon.ico" style="display:none; width:100%; margin-top:8px;" oninput="updateCloakPreview()" />
+      <div id="cloak-preview">
+        <img id="preview-favicon" src="https://cdn.kastatic.org/images/favicon.ico" onerror="this.style.display='none'" />
+        <span id="cloak-title-preview">Khan Academy</span>
+        <span style="margin-left:auto;font-size:10px;color:var(--dim)">live preview</span>
+      </div>
+    </div>
+    <!-- EMERGENCY -->
+    <div class="sp-section">
+      <div class="sp-section-title">⚡ Emergency Redirect</div>
+      <div class="sp-row">
+        <div><div class="sp-label">Redirect URL</div><div class="sp-desc">Where ESC button takes you instantly</div></div>
+        <input class="sp-input" id="emergency-url" type="text" value="https://classroom.google.com" />
+      </div>
+      <div class="sp-row">
+        <div><div class="sp-label">Keyboard Shortcut</div><div class="sp-desc">Press to instantly bail out</div></div>
+        <span class="hotkey">Alt + E</span>
+      </div>
+      <div class="sp-row">
+        <div><div class="sp-label">Cloak before redirect</div><div class="sp-desc">Apply tab disguise first, then navigate</div></div>
+        <div class="toggle on" id="cloak-on-esc-toggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+    <!-- APPEARANCE -->
+    <div class="sp-section">
+      <div class="sp-section-title">🎨 Appearance</div>
+      <div class="sp-row">
+        <div><div class="sp-label">Accent Color</div><div class="sp-desc">Primary UI highlight color</div></div>
+        <input type="color" value="#5b6af0" id="accent-color-input" onchange="applyAccent(this.value)"
+          style="width:60px;height:32px;border:1px solid var(--border);border-radius:7px;background:var(--surface2);cursor:pointer;padding:2px;" />
+      </div>
+    </div>
+    <button class="sp-save" onclick="saveSettings()">SAVE &amp; APPLY</button>
+  </div>
+</div>
+
+<div id="toast">✓ Saved</div>
+
+<script>
+let cloakEnabled = false;
+
+function switchPage(id, tabEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tb-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (tabEl) tabEl.classList.add('active');
+}
+
+function openSettings() { document.getElementById('settings-overlay').classList.add('open'); }
+function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); }
+function closeSettingsOutside(e) { if (e.target.id === 'settings-overlay') closeSettings(); }
+
+function toggleCloak() {
+  const t = document.getElementById('cloak-toggle');
+  t.classList.toggle('on');
+  cloakEnabled = t.classList.contains('on');
+  cloakEnabled ? applyCloak() : removeCloak();
+}
+
+function applyCloak() {
+  const title = document.getElementById('cloak-title-input').value || document.title;
+  document.title = title;
+  const sel = document.getElementById('cloak-favicon-select').value;
+  const url = sel === 'custom' ? document.getElementById('cloak-favicon-custom').value : sel;
+  document.getElementById('page-favicon').href = url;
+}
+
+function removeCloak() {
+  document.title = 'Totally Educational Page';
+  document.getElementById('page-favicon').href = 'https://cdn.kastatic.org/images/favicon.ico';
+}
+
+function updateCloakPreview() {
+  const title = document.getElementById('cloak-title-input').value || 'Tab Title';
+  document.getElementById('cloak-title-preview').textContent = title;
+  const sel = document.getElementById('cloak-favicon-select').value;
+  const customInput = document.getElementById('cloak-favicon-custom');
+  if (sel === 'custom') {
+    customInput.style.display = 'block';
+    document.getElementById('preview-favicon').src = customInput.value;
+  } else {
+    customInput.style.display = 'none';
+    document.getElementById('preview-favicon').src = sel;
+  }
+  if (cloakEnabled) applyCloak();
+}
+
+function applyAccent(hex) {
+  document.documentElement.style.setProperty('--accent', hex);
+}
+
+function doEmergency() {
+  const url = document.getElementById('emergency-url').value || 'https://classroom.google.com';
+  const cloakFirst = document.getElementById('cloak-on-esc-toggle').classList.contains('on');
+  if (cloakFirst) applyCloak();
+  setTimeout(() => { window.location.href = url; }, cloakFirst ? 60 : 0);
+}
+
+function saveSettings() {
+  const s = {
+    cloakEnabled,
+    cloakTitle: document.getElementById('cloak-title-input').value,
+    cloakFavicon: document.getElementById('cloak-favicon-select').value,
+    cloakFaviconCustom: document.getElementById('cloak-favicon-custom').value,
+    emergencyUrl: document.getElementById('emergency-url').value,
+    accentColor: document.getElementById('accent-color-input').value,
+  };
+  try { localStorage.setItem('edu_settings', JSON.stringify(s)); } catch(e){}
+  closeSettings();
+  showToast('✓ Settings saved');
+  if (cloakEnabled) applyCloak();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Load saved settings
+(function() {
+  try {
+    const raw = localStorage.getItem('edu_settings');
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (s.cloakTitle) document.getElementById('cloak-title-input').value = s.cloakTitle;
+    if (s.cloakFavicon) document.getElementById('cloak-favicon-select').value = s.cloakFavicon;
+    if (s.cloakFaviconCustom) document.getElementById('cloak-favicon-custom').value = s.cloakFaviconCustom;
+    if (s.emergencyUrl) document.getElementById('emergency-url').value = s.emergencyUrl;
+    if (s.accentColor) { document.getElementById('accent-color-input').value = s.accentColor; applyAccent(s.accentColor); }
+    if (s.cloakEnabled) { cloakEnabled = true; document.getElementById('cloak-toggle').classList.add('on'); applyCloak(); }
+    updateCloakPreview();
+  } catch(e) {}
+})();
+
+document.addEventListener('keydown', e => {
+  if (e.altKey && e.key.toLowerCase() === 'e') { e.preventDefault(); doEmergency(); }
+  if (e.altKey && e.key.toLowerCase() === 's') { e.preventDefault(); openSettings(); }
+  if (e.key === 'Escape') closeSettings();
+});
+
+// ── SKIPVIDS FUNCTIONS ──
+(function() {
+  const iframe = document.getElementById('sv-iframe');
+  const fallback = document.getElementById('sv-fallback');
+  let loaded = false;
+
+  iframe.addEventListener('load', () => {
+    loaded = true;
+    // Try to detect cross-origin block: if we can access contentDocument at all
+    // and it's empty/blank, show fallback. Cross-origin throw = page loaded fine.
+    setTimeout(() => {
+      try {
+        const doc = iframe.contentDocument;
+        if (doc && (!doc.body || doc.body.innerHTML.trim() === '')) {
+          showSvFallback();
+        }
+      } catch(e) {
+        // Cross-origin access denied = page actually loaded with content
+      }
+    }, 1500);
+  });
+
+  iframe.addEventListener('error', showSvFallback);
+  setTimeout(() => { if (!loaded) showSvFallback(); }, 9000);
+
+  function showSvFallback() {
+    iframe.style.display = 'none';
+    fallback.classList.add('show');
+  }
+})();
+
+function svFullscreen() {
+  const w = document.getElementById('sv-iframe-wrap');
+  (w.requestFullscreen || w.webkitRequestFullscreen).call(w);
+}
+function svReload() {
+  const f = document.getElementById('sv-iframe');
+  f.src = f.src;
+}
+function svOpenDirect() { window.open('https://skipvids.com/', '_blank', 'noopener'); }
+function svOpenBrowser() { window.location.href = 'browser.html?url=' + encodeURIComponent('https://skipvids.com/'); }
+function svOpenProxy() { window.location.href = 'browser.html?url=' + encodeURIComponent('https://www.croxyproxy.com/requests/get?url=https%3A%2F%2Fskipvids.com%2F'); }
+</script>
+</body>
+</html>

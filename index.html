@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Public Educational Resources</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f8f9fc;--bg2:#f0f2f8;--surface:#ffffff;--surface2:#f4f6fb;--border:#e2e6f0;--border2:#c8cedf;--text:#1a1d2e;--text2:#4a5068;--text3:#8a92a8;--blue:#2563eb;--blue2:#1d4ed8;--blue-dim:#eff6ff;--green:#059669;--green-dim:#ecfdf5;--amber:#d97706;--amber-dim:#fffbeb;--red:#dc2626;--red-dim:#fef2f2;--violet:#7c3aed;--violet-dim:#f5f3ff;--teal:#0891b2;--teal-dim:#ecfeff;--rose:#e11d48;--rose-dim:#fff1f2;--shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 12px rgba(0,0,0,0.04);--shadow2:0 4px 20px rgba(0,0,0,0.1),0 1px 4px rgba(0,0,0,0.06);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+#topbar{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;padding:0 28px;gap:14px;box-shadow:0 1px 0 var(--border),0 2px 12px rgba(0,0,0,0.04);}
+.site-name{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--text);white-space:nowrap;flex-shrink:0;}
+.site-name span{color:var(--blue);}
+.tb-sep{width:1px;height:20px;background:var(--border);flex-shrink:0;}
+.grade-strip{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex-shrink:1;}
+.grade-strip::-webkit-scrollbar{display:none;}
+.gchip{flex-shrink:0;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text3);font-family:'DM Mono',monospace;font-size:0.68rem;font-weight:500;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.gchip:hover{border-color:var(--border2);color:var(--text2);}
+.gchip.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.search-wrap{position:relative;}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;font-size:14px;}
+#gsearch{width:220px;height:34px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0 12px 0 32px;font-family:'DM Sans',sans-serif;font-size:0.84rem;color:var(--text);outline:none;transition:all 0.15s;}
+#gsearch:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,0.1);background:#fff;}
+#gsearch::placeholder{color:var(--text3);}
+.secret-trigger{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);transition:all 0.15s;font-size:16px;}
+.secret-trigger:hover{background:var(--surface2);color:var(--text2);border-color:var(--border2);}
+
+.layout{display:grid;grid-template-columns:220px 1fr;max-width:1400px;margin:0 auto;padding:0 24px 80px;min-height:calc(100vh - 58px);}
+.sidebar{padding:24px 16px 24px 0;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;scrollbar-width:none;border-right:1px solid var(--border);}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-label{font-family:'DM Mono',monospace;font-size:0.58rem;font-weight:500;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;padding:0 8px 8px;margin-top:20px;display:block;}
+.sb-label:first-child{margin-top:0;}
+.subj-btn{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:8px;border:none;background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:400;cursor:pointer;transition:all 0.13s;text-align:left;margin-bottom:2px;}
+.subj-btn:hover{background:var(--surface2);color:var(--text);}
+.subj-btn.active{background:var(--blue-dim);color:var(--blue);font-weight:600;}
+.subj-pip{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+.main{padding:28px 0 0 28px;min-width:0;}
+.search-results{display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:20px;box-shadow:var(--shadow);}
+.search-results.show{display:block;}
+.sr-label{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--text3);margin-bottom:12px;}
+.sr-hit{padding:10px 13px;border-radius:8px;background:var(--surface2);margin-bottom:6px;cursor:pointer;transition:background 0.13s;border:1px solid transparent;text-decoration:none;display:block;}
+.sr-hit:hover{border-color:var(--border2);}
+.sr-hit-title{font-weight:600;font-size:0.85rem;color:var(--text);}
+.sr-hit-url{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--blue);margin-top:2px;}
+.sr-hit-meta{font-size:0.72rem;color:var(--text3);margin-top:2px;}
+mark{background:rgba(37,99,235,0.15);color:var(--blue);border-radius:2px;padding:0 2px;}
+
+.panel{display:none;}
+.panel.active{display:block;animation:fadeIn 0.25s ease both;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.panel-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.panel-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.panel-header h2{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;letter-spacing:-0.01em;}
+.panel-header p{font-size:0.82rem;color:var(--text3);margin-top:3px;}
+
+.gtabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:22px;}
+.gtab{padding:5px 16px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;cursor:pointer;transition:all 0.13s;}
+.gtab:hover{border-color:var(--border2);color:var(--text2);}
+.gtab.active{background:var(--surface2);border-color:var(--border2);color:var(--text);}
+.gcontent{display:none;}
+.gcontent.active{display:block;}
+
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:24px;}
+.res-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);transition:all 0.18s;text-decoration:none;display:flex;flex-direction:column;}
+.res-card:hover{box-shadow:var(--shadow2);transform:translateY(-2px);border-color:var(--border2);}
+.rc-top{padding:13px 15px 11px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;}
+.rc-favicon{width:32px;height:32px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.rc-info{flex:1;min-width:0;}
+.rc-name{font-weight:600;font-size:0.9rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rc-url{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.rc-badge{flex-shrink:0;font-family:'DM Mono',monospace;font-size:0.55rem;padding:2px 8px;border-radius:10px;font-weight:500;letter-spacing:0.04em;align-self:flex-start;}
+.rc-body{padding:11px 15px 13px;font-size:0.82rem;color:var(--text2);line-height:1.55;flex:1;}
+.sec-label{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin:20px 0 12px;display:flex;align-items:center;gap:10px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* SECRET OVERLAY */
+.secret-overlay{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;}
+.secret-overlay.open{display:flex;}
+.secret-modal{background:#07090f;border:1px solid rgba(255,106,0,0.3);border-top:2px solid #ff6a00;border-radius:6px;max-width:400px;width:92%;padding:40px 36px 32px;position:relative;box-shadow:0 0 80px rgba(255,106,0,0.1),0 40px 100px rgba(0,0,0,0.6);animation:smUp 0.22s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes smUp{from{opacity:0;transform:translateY(18px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.sm-close{position:absolute;top:14px;right:16px;background:transparent;border:none;color:#3a2a1a;font-size:1rem;cursor:pointer;font-family:'DM Mono',monospace;padding:4px 8px;transition:color 0.15s;}
+.sm-close:hover{color:#ff6a00;}
+.sm-eyebrow{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.25em;color:#3a2a1a;text-transform:uppercase;margin-bottom:12px;}
+.sm-title{font-family:'DM Mono',monospace;font-size:1.6rem;font-weight:500;color:#ff6a00;text-shadow:0 0 24px rgba(255,106,0,0.4);letter-spacing:0.06em;margin-bottom:16px;}
+.sm-input-wrap{margin-bottom:12px;}
+.sm-label{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;color:#5a3a1a;text-transform:uppercase;margin-bottom:6px;display:block;}
+.sm-input{width:100%;height:42px;background:rgba(255,106,0,0.06);border:1px solid rgba(255,106,0,0.25);border-radius:4px;color:#ff6a00;font-family:'DM Mono',monospace;font-size:1rem;letter-spacing:0.12em;padding:0 14px;outline:none;transition:all 0.15s;}
+.sm-input:focus{border-color:#ff6a00;box-shadow:0 0 0 3px rgba(255,106,0,0.12);}
+.sm-input::placeholder{color:#3a2a1a;}
+.sm-error{font-family:'DM Mono',monospace;font-size:0.65rem;color:#ff4455;min-height:18px;margin-bottom:8px;text-align:center;}
+.sm-error.shake{animation:shake 0.3s ease;}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.sm-btn{width:100%;height:42px;background:rgba(255,106,0,0.1);border:1px solid rgba(255,106,0,0.35);color:#ff6a00;font-family:'DM Mono',monospace;font-size:0.8rem;font-weight:500;letter-spacing:0.1em;cursor:pointer;border-radius:4px;transition:all 0.15s;text-transform:uppercase;}
+.sm-btn:hover{background:rgba(255,106,0,0.18);box-shadow:0 0 20px rgba(255,106,0,0.2);}
+.sm-divider{height:1px;background:rgba(255,106,0,0.12);margin:18px 0;}
+.sm-links-label{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.2em;color:#3a2a1a;text-transform:uppercase;margin-bottom:10px;}
+.sm-link{display:block;width:100%;padding:12px 18px;background:rgba(255,106,0,0.06);border:1px solid rgba(255,106,0,0.25);color:#ff6a00;font-family:'DM Mono',monospace;font-size:0.75rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;text-align:center;transition:all 0.18s;border-radius:3px;margin-bottom:8px;}
+.sm-link:hover{background:rgba(255,106,0,0.14);box-shadow:0 0 20px rgba(255,106,0,0.18);border-color:rgba(255,106,0,0.55);}
+.sm-link.blue{border-color:rgba(77,159,255,0.3);color:#4d9fff;background:rgba(77,159,255,0.06);}
+.sm-link.blue:hover{background:rgba(77,159,255,0.14);border-color:rgba(77,159,255,0.5);}
+.sm-link.green{border-color:rgba(0,255,136,0.3);color:#00ff88;background:rgba(0,255,136,0.04);}
+.sm-link.green:hover{background:rgba(0,255,136,0.1);border-color:rgba(0,255,136,0.5);}
+.sm-footer{margin-top:18px;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.15em;color:#231510;text-align:center;}
+
+@media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{position:static;height:auto;display:flex;flex-wrap:wrap;gap:4px;padding:12px 0;border-right:none;border-bottom:1px solid var(--border);}.sb-label{display:none;}.subj-btn{width:auto;padding:5px 12px;font-size:0.78rem;}.main{padding:20px 0 0;}.grade-strip{display:none;}#gsearch{width:140px;}}
+</style>
+</head>
+<body>
+
+<header id="topbar">
+  <span class="site-name">Public <span>Educational</span> Resources</span>
+  <div class="tb-sep"></div>
+  <div class="grade-strip">
+    <button class="gchip active" onclick="quickGrade('all',this)">All Grades</button>
+    <button class="gchip" onclick="quickGrade('6',this)">6th</button>
+    <button class="gchip" onclick="quickGrade('7',this)">7th</button>
+    <button class="gchip" onclick="quickGrade('8',this)">8th</button>
+    <button class="gchip" onclick="quickGrade('9',this)">9th</button>
+    <button class="gchip" onclick="quickGrade('10',this)">10th</button>
+    <button class="gchip" onclick="quickGrade('11',this)">11th</button>
+    <button class="gchip" onclick="quickGrade('12',this)">12th</button>
+  </div>
+  <div class="tb-right">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input id="gsearch" type="text" placeholder="Search resources…" oninput="doSearch(this.value)">
+    </div>
+    <button class="secret-trigger" onclick="openSecret()" title="Settings">⚙️</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <span class="sb-label">Subjects</span>
+    <button class="subj-btn active" onclick="showPanel('math')" data-p="math"><span class="subj-pip" style="background:#2563eb"></span>Mathematics</button>
+    <button class="subj-btn" onclick="showPanel('ela')" data-p="ela"><span class="subj-pip" style="background:#059669"></span>ELA &amp; Writing</button>
+    <button class="subj-btn" onclick="showPanel('science')" data-p="science"><span class="subj-pip" style="background:#7c3aed"></span>Science</button>
+    <button class="subj-btn" onclick="showPanel('history')" data-p="history"><span class="subj-pip" style="background:#d97706"></span>History &amp; SS</button>
+    <button class="subj-btn" onclick="showPanel('chemistry')" data-p="chemistry"><span class="subj-pip" style="background:#0891b2"></span>Chemistry</button>
+    <button class="subj-btn" onclick="showPanel('physics')" data-p="physics"><span class="subj-pip" style="background:#dc2626"></span>Physics</button>
+    <button class="subj-btn" onclick="showPanel('biology')" data-p="biology"><span class="subj-pip" style="background:#059669"></span>Biology</button>
+    <button class="subj-btn" onclick="showPanel('cs')" data-p="cs"><span class="subj-pip" style="background:#2563eb"></span>Computer Science</button>
+    <button class="subj-btn" onclick="showPanel('calc')" data-p="calc"><span class="subj-pip" style="background:#e11d48"></span>Calculus</button>
+    <button class="subj-btn" onclick="showPanel('art')" data-p="art"><span class="subj-pip" style="background:#7c3aed"></span>Arts &amp; Music</button>
+    <button class="subj-btn" onclick="showPanel('tools')" data-p="tools"><span class="subj-pip" style="background:#d97706"></span>Study Tools</button>
+  </aside>
+
+  <main class="main">
+    <div class="search-results" id="search-results">
+      <div class="sr-label" id="sr-label"></div>
+      <div id="sr-hits"></div>
+    </div>
+
+<!-- MATH -->
+<div class="panel active" id="panel-math">
+  <div class="panel-header"><div class="panel-icon" style="background:#eff6ff">📐</div><div><h2 style="color:#2563eb">Mathematics</h2><p>From fractions to calculus — free tools and lessons for every level</p></div></div>
+  <div class="gtabs">
+    <button class="gtab active" onclick="showG('math','6',this)">6th Grade</button>
+    <button class="gtab" onclick="showG('math','7',this)">7th Grade</button>
+    <button class="gtab" onclick="showG('math','8',this)">8th Grade</button>
+    <button class="gtab" onclick="showG('math','alg1',this)">Algebra I</button>
+    <button class="gtab" onclick="showG('math','geo',this)">Geometry</button>
+    <button class="gtab" onclick="showG('math','alg2',this)">Algebra II</button>
+    <button class="gtab" onclick="showG('math','precalc',this)">Pre-Calc / Calc</button>
+  </div>
+  <div class="gcontent active" id="math-6">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/math/cc-sixth-grade-math" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — 6th Grade Math</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Full video lessons covering fractions, ratios, percentages, area, and statistics with practice exercises.</div></a>
+      <a class="res-card" href="https://www.desmos.com/calculator" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">📊</div><div class="rc-info"><div class="rc-name">Desmos Graphing Calculator</div><div class="rc-url">desmos.com</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">TOOL</span></div><div class="rc-body">Free graphing calculator — visualize equations, plot functions, and explore math interactively in your browser.</div></a>
+      <a class="res-card" href="https://www.mathplayground.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🎮</div><div class="rc-info"><div class="rc-name">Math Playground</div><div class="rc-url">mathplayground.com</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Math games and interactive problem solving for grades 1–8. Fractions, decimals, ratios, and more.</div></a>
+      <a class="res-card" href="https://www.ixl.com/math/grade-6" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">✏️</div><div class="rc-info"><div class="rc-name">IXL Math — Grade 6</div><div class="rc-url">ixl.com</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">PRACTICE</span></div><div class="rc-body">Adaptive practice problems with instant feedback covering every 6th grade math skill and standard.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="math-7">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/math/cc-seventh-grade-math" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — 7th Grade Math</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Proportions, circles, expressions, inequalities, and probability — complete 7th grade curriculum.</div></a>
+      <a class="res-card" href="https://www.mathsisfun.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">📐</div><div class="rc-info"><div class="rc-name">Math is Fun</div><div class="rc-url">mathsisfun.com</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">REFERENCE</span></div><div class="rc-body">Clear explanations of math concepts with interactive examples, puzzles, and exercises across all topics.</div></a>
+      <a class="res-card" href="https://www.ixl.com/math/grade-7" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">✏️</div><div class="rc-info"><div class="rc-name">IXL Math — Grade 7</div><div class="rc-url">ixl.com</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">PRACTICE</span></div><div class="rc-body">Hundreds of adaptive practice problems for every 7th grade math skill with smart recommendations.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="math-8">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/math/cc-eighth-grade-math" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — 8th Grade Math</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Linear equations, exponents, Pythagorean theorem, and functions — full 8th grade curriculum with videos.</div></a>
+      <a class="res-card" href="https://www.desmos.com/geometry" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">📐</div><div class="rc-info"><div class="rc-name">Desmos Geometry</div><div class="rc-url">desmos.com/geometry</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">TOOL</span></div><div class="rc-body">Free geometry construction tool — draw, measure, and explore geometric figures and theorems interactively.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="math-alg1">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/math/algebra" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — Algebra I</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Quadratics, systems of equations, polynomials, and functions — complete Algebra I curriculum.</div></a>
+      <a class="res-card" href="https://www.wolframalpha.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🧮</div><div class="rc-info"><div class="rc-name">Wolfram Alpha</div><div class="rc-url">wolframalpha.com</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">SOLVER</span></div><div class="rc-body">Solve equations, graph functions, and get step-by-step solutions for virtually any math problem.</div></a>
+      <a class="res-card" href="https://www.purplemath.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">📘</div><div class="rc-info"><div class="rc-name">Purple Math</div><div class="rc-url">purplemath.com</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">LESSONS</span></div><div class="rc-body">Clear, practical algebra lessons written specifically for students — covers all algebra topics with worked examples.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="math-geo">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/math/geometry" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — Geometry</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Proofs, triangles, circles, 3D figures, and trig basics — complete high school geometry curriculum.</div></a>
+      <a class="res-card" href="https://www.geogebra.org" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">📐</div><div class="rc-info"><div class="rc-name">GeoGebra</div><div class="rc-url">geogebra.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">INTERACTIVE</span></div><div class="rc-body">Free dynamic mathematics software for geometry, algebra, and statistics with thousands of interactive applets.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="math-alg2">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/math/algebra2" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — Algebra II</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Logarithms, complex numbers, conic sections, sequences and series — full Algebra II curriculum.</div></a>
+      <a class="res-card" href="https://www.khanacademy.org/math/statistics-probability" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">📊</div><div class="rc-info"><div class="rc-name">Khan Academy — Statistics &amp; Probability</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Probability, distributions, hypothesis testing, and regression — AP Statistics preparation included.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="math-precalc">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/math/precalculus" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — Pre-Calculus</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Functions, trigonometry, polar coordinates, vectors, and intro to limits — full Pre-Calc curriculum.</div></a>
+      <a class="res-card" href="https://www.khanacademy.org/math/calculus-1" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — Calculus I</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Limits, derivatives, and integrals — complete AP Calculus AB preparation with video lessons.</div></a>
+      <a class="res-card" href="https://www.3blue1brown.com/topics/calculus" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🎬</div><div class="rc-info"><div class="rc-name">3Blue1Brown — Essence of Calculus</div><div class="rc-url">3blue1brown.com</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">VIDEO</span></div><div class="rc-body">Beautiful visual explanations of why calculus works. The best series for deep conceptual understanding.</div></a>
+      <a class="res-card" href="https://www.paul.math.lamar.edu" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">📘</div><div class="rc-info"><div class="rc-name">Paul's Online Math Notes</div><div class="rc-url">paul.math.lamar.edu</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">REFERENCE</span></div><div class="rc-body">Legendary free calculus notes used by millions of students — thorough explanations and worked examples.</div></a>
+    </div>
+  </div>
+</div>
+
+<!-- ELA -->
+<div class="panel" id="panel-ela">
+  <div class="panel-header"><div class="panel-icon" style="background:#ecfdf5">✏️</div><div><h2 style="color:#059669">ELA &amp; Writing</h2><p>Grammar, literature, essay writing, vocabulary, and language arts resources</p></div></div>
+  <div class="gtabs">
+    <button class="gtab active" onclick="showG('ela','67',this)">6–7th Grade</button>
+    <button class="gtab" onclick="showG('ela','89',this)">8–9th Grade</button>
+    <button class="gtab" onclick="showG('ela','1012',this)">10–12th Grade</button>
+  </div>
+  <div class="gcontent active" id="ela-67">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/ela/cc-6th-reading-vocab" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — 6th ELA</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">FREE</span></div><div class="rc-body">Reading comprehension, vocabulary, grammar, and foundational writing skills for 6th grade.</div></a>
+      <a class="res-card" href="https://www.noredink.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">📝</div><div class="rc-info"><div class="rc-name">NoRedInk</div><div class="rc-url">noredink.com</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">GRAMMAR</span></div><div class="rc-body">Adaptive grammar and writing practice — master punctuation, usage, and style with personalized exercises.</div></a>
+      <a class="res-card" href="https://www.vocabulary.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">📚</div><div class="rc-info"><div class="rc-name">Vocabulary.com</div><div class="rc-url">vocabulary.com</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">VOCAB</span></div><div class="rc-body">Adaptive vocabulary building with definitions, examples, and games that actually make words stick.</div></a>
+      <a class="res-card" href="https://www.commonlit.org" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">📖</div><div class="rc-info"><div class="rc-name">CommonLit</div><div class="rc-url">commonlit.org</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">FREE</span></div><div class="rc-body">Free reading passages with guided questions — fiction, nonfiction, poetry by grade level.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="ela-89">
+    <div class="res-grid">
+      <a class="res-card" href="https://owl.purdue.edu/owl/general_writing/index.html" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">🦉</div><div class="rc-info"><div class="rc-name">Purdue OWL Writing Lab</div><div class="rc-url">owl.purdue.edu</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">REFERENCE</span></div><div class="rc-body">The gold standard writing resource — MLA, APA, grammar rules, essay structure, and research writing guides.</div></a>
+      <a class="res-card" href="https://www.grammarly.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">✅</div><div class="rc-info"><div class="rc-name">Grammarly</div><div class="rc-url">grammarly.com</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">TOOL</span></div><div class="rc-body">AI writing assistant that catches grammar mistakes, suggests improvements, and strengthens your writing.</div></a>
+      <a class="res-card" href="https://www.sparknotes.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">⚡</div><div class="rc-info"><div class="rc-name">SparkNotes</div><div class="rc-url">sparknotes.com</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">STUDY</span></div><div class="rc-body">Literature guides, summaries, analysis, and study questions for every major work of literature.</div></a>
+      <a class="res-card" href="https://www.literarydevices.net" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">📚</div><div class="rc-info"><div class="rc-name">Literary Devices</div><div class="rc-url">literarydevices.net</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">REFERENCE</span></div><div class="rc-body">Definitions and examples of every literary device — metaphor, irony, symbolism, and 200+ more terms.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="ela-1012">
+    <div class="res-grid">
+      <a class="res-card" href="https://owl.purdue.edu/owl/research_and_citation/mla_style/mla_formatting_and_style_guide/mla_general_format.html" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">📄</div><div class="rc-info"><div class="rc-name">Purdue OWL — MLA 9 Guide</div><div class="rc-url">owl.purdue.edu</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">CITATION</span></div><div class="rc-body">Complete MLA 9th edition guide — in-text citations, works cited, paper formatting rules.</div></a>
+      <a class="res-card" href="https://www.easybib.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">📎</div><div class="rc-info"><div class="rc-name">EasyBib Citation Generator</div><div class="rc-url">easybib.com</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">TOOL</span></div><div class="rc-body">Automatic citation generator for MLA, APA, and Chicago — books, websites, journals, and more.</div></a>
+      <a class="res-card" href="https://www.poetryfoundation.org" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">🎭</div><div class="rc-info"><div class="rc-name">Poetry Foundation</div><div class="rc-url">poetryfoundation.org</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">FREE</span></div><div class="rc-body">Thousands of poems, poet biographies, and essays — essential for AP Literature and poetry analysis.</div></a>
+    </div>
+  </div>
+</div>
+
+<!-- SCIENCE -->
+<div class="panel" id="panel-science">
+  <div class="panel-header"><div class="panel-icon" style="background:#f5f3ff">🔬</div><div><h2 style="color:#7c3aed">Science</h2><p>Earth science, life science, and physical science — middle school</p></div></div>
+  <div class="gtabs">
+    <button class="gtab active" onclick="showG('science','6',this)">6th — Earth Science</button>
+    <button class="gtab" onclick="showG('science','7',this)">7th — Life Science</button>
+    <button class="gtab" onclick="showG('science','8',this)">8th — Physical Science</button>
+  </div>
+  <div class="gcontent active" id="science-6">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/science/ms-earth-and-space-science" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#f5f3ff">🌍</div><div class="rc-info"><div class="rc-name">Khan Academy — Earth Science</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#f5f3ff;color:#7c3aed">FREE</span></div><div class="rc-body">Rock cycle, plate tectonics, atmosphere, weather, and Earth systems — full middle school earth science.</div></a>
+      <a class="res-card" href="https://www.nasa.gov/learning-resources" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#f5f3ff">🚀</div><div class="rc-info"><div class="rc-name">NASA Learning Resources</div><div class="rc-url">nasa.gov</div></div><span class="rc-badge" style="background:#f5f3ff;color:#7c3aed">FREE</span></div><div class="rc-body">NASA's free educational resources — space science, Earth science, engineering challenges, and STEM activities.</div></a>
+      <a class="res-card" href="https://www.pbslearningmedia.org" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#f5f3ff">📺</div><div class="rc-info"><div class="rc-name">PBS Learning Media</div><div class="rc-url">pbslearningmedia.org</div></div><span class="rc-badge" style="background:#f5f3ff;color:#7c3aed">VIDEO</span></div><div class="rc-body">Thousands of free educational videos and interactive media from PBS covering science, history, and ELA.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="science-7">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/science/ms-biology" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#f5f3ff">🧬</div><div class="rc-info"><div class="rc-name">Khan Academy — MS Biology</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#f5f3ff;color:#7c3aed">FREE</span></div><div class="rc-body">Cells, genetics, ecosystems, and body systems — complete middle school life science curriculum.</div></a>
+      <a class="res-card" href="https://www.hhmi.org/biointeractive" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#f5f3ff">🔬</div><div class="rc-info"><div class="rc-name">HHMI BioInteractive</div><div class="rc-url">hhmi.org</div></div><span class="rc-badge" style="background:#f5f3ff;color:#7c3aed">FREE</span></div><div class="rc-body">Free biology resources from Howard Hughes Medical Institute — videos, animations, and data activities.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="science-8">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/science/ms-physics" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#f5f3ff">⚡</div><div class="rc-info"><div class="rc-name">Khan Academy — MS Physics</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#f5f3ff;color:#7c3aed">FREE</span></div><div class="rc-body">Forces, motion, energy, waves, and electricity — complete 8th grade physical science curriculum.</div></a>
+      <a class="res-card" href="https://phet.colorado.edu" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#f5f3ff">🧪</div><div class="rc-info"><div class="rc-name">PhET Interactive Simulations</div><div class="rc-url">phet.colorado.edu</div></div><span class="rc-badge" style="background:#f5f3ff;color:#7c3aed">SIMULATION</span></div><div class="rc-body">Free science and math simulations from the University of Colorado — physics, chemistry, biology, earth science.</div></a>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="panel" id="panel-history">
+  <div class="panel-header"><div class="panel-icon" style="background:#fffbeb">🌍</div><div><h2 style="color:#d97706">History &amp; Social Studies</h2><p>US History, World History, Geography, Civics, and Economics</p></div></div>
+  <div class="gtabs">
+    <button class="gtab active" onclick="showG('history','67',this)">6–7th Grade</button>
+    <button class="gtab" onclick="showG('history','8',this)">8th Grade</button>
+    <button class="gtab" onclick="showG('history','910',this)">9–10th Grade</button>
+    <button class="gtab" onclick="showG('history','1112',this)">11–12th Grade</button>
+  </div>
+  <div class="gcontent active" id="history-67">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/humanities/world-history" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — World History</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">FREE</span></div><div class="rc-body">Ancient civilizations through modern history — Egypt, Greece, Rome, Middle Ages, and beyond.</div></a>
+      <a class="res-card" href="https://www.worldhistory.org" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">📜</div><div class="rc-info"><div class="rc-name">World History Encyclopedia</div><div class="rc-url">worldhistory.org</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">REFERENCE</span></div><div class="rc-body">Free encyclopedia of world history — expert-written articles, maps, timelines, and primary sources.</div></a>
+      <a class="res-card" href="https://www.nationalgeographic.org/education" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">🗺️</div><div class="rc-info"><div class="rc-name">National Geographic Education</div><div class="rc-url">nationalgeographic.org</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">FREE</span></div><div class="rc-body">Geography, culture, and history resources from National Geographic — maps, articles, and videos.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="history-8">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/humanities/us-history" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — US History</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">FREE</span></div><div class="rc-body">Colonial America through Reconstruction — complete 8th grade US History with videos and exercises.</div></a>
+      <a class="res-card" href="https://www.loc.gov/families" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">🏛️</div><div class="rc-info"><div class="rc-name">Library of Congress</div><div class="rc-url">loc.gov</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">PRIMARY</span></div><div class="rc-body">Primary sources, historical documents, photos, and maps from the Library of Congress — free for students.</div></a>
+      <a class="res-card" href="https://www.constitutioncenter.org/learn" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">📜</div><div class="rc-info"><div class="rc-name">National Constitution Center</div><div class="rc-url">constitutioncenter.org</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">CIVICS</span></div><div class="rc-body">Interactive Constitution, founding documents, and civics resources — perfect for 8th grade government units.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="history-910">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/humanities/ap-us-history" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — AP US History</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">AP PREP</span></div><div class="rc-body">Full AP US History preparation — period reviews, document analysis, DBQ practice, and exam strategies.</div></a>
+      <a class="res-card" href="https://www.history.com/topics" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">📺</div><div class="rc-info"><div class="rc-name">History.com</div><div class="rc-url">history.com</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">REFERENCE</span></div><div class="rc-body">Articles, videos, and reference material on every major historical topic — well-sourced and student-friendly.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="history-1112">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/humanities/ap-us-history" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — AP World / US History</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">AP PREP</span></div><div class="rc-body">AP World History and AP US History — full curriculum, practice tests, and exam preparation.</div></a>
+      <a class="res-card" href="https://www.c-span.org/classroom" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">📡</div><div class="rc-info"><div class="rc-name">C-SPAN Classroom</div><div class="rc-url">c-span.org</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">FREE</span></div><div class="rc-body">Free primary source videos of government proceedings, speeches, and historical events for civics and history.</div></a>
+    </div>
+  </div>
+</div>
+
+<!-- CHEMISTRY -->
+<div class="panel" id="panel-chemistry">
+  <div class="panel-header"><div class="panel-icon" style="background:#ecfeff">⚗️</div><div><h2 style="color:#0891b2">Chemistry</h2><p>Atomic structure, bonding, reactions, thermodynamics, and lab skills</p></div></div>
+  <div class="gtabs">
+    <button class="gtab active" onclick="showG('chemistry','910',this)">9–10th Grade</button>
+    <button class="gtab" onclick="showG('chemistry','1112',this)">11–12th / AP Chem</button>
+  </div>
+  <div class="gcontent active" id="chemistry-910">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/science/chemistry" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfeff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — Chemistry</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#ecfeff;color:#0891b2">FREE</span></div><div class="rc-body">Atoms, periodic table, bonding, reactions, stoichiometry, and gases — full high school chemistry.</div></a>
+      <a class="res-card" href="https://ptable.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfeff">⚛️</div><div class="rc-info"><div class="rc-name">PTable — Interactive Periodic Table</div><div class="rc-url">ptable.com</div></div><span class="rc-badge" style="background:#ecfeff;color:#0891b2">TOOL</span></div><div class="rc-body">The best interactive periodic table — click any element for properties, electron configurations, and orbital diagrams.</div></a>
+      <a class="res-card" href="https://phet.colorado.edu/en/simulations/filter?subjects=chemistry" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfeff">🧪</div><div class="rc-info"><div class="rc-name">PhET Chemistry Simulations</div><div class="rc-url">phet.colorado.edu</div></div><span class="rc-badge" style="background:#ecfeff;color:#0891b2">SIMULATION</span></div><div class="rc-body">Virtual chemistry labs — build molecules, run reactions, explore acid-base equilibrium. Completely free.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="chemistry-1112">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/science/ap-chemistry-beta" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfeff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — AP Chemistry</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#ecfeff;color:#0891b2">AP PREP</span></div><div class="rc-body">Complete AP Chemistry — thermodynamics, kinetics, equilibrium, electrochemistry, and more.</div></a>
+      <a class="res-card" href="https://www.chemguide.co.uk" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfeff">📘</div><div class="rc-info"><div class="rc-name">ChemGuide</div><div class="rc-url">chemguide.co.uk</div></div><span class="rc-badge" style="background:#ecfeff;color:#0891b2">REFERENCE</span></div><div class="rc-body">Detailed chemistry notes covering A-level and AP topics — bonding, mechanisms, and thermodynamics.</div></a>
+    </div>
+  </div>
+</div>
+
+<!-- PHYSICS -->
+<div class="panel" id="panel-physics">
+  <div class="panel-header"><div class="panel-icon" style="background:#fef2f2">⚡</div><div><h2 style="color:#dc2626">Physics</h2><p>Mechanics, electricity, waves, thermodynamics, and modern physics</p></div></div>
+  <div class="gtabs">
+    <button class="gtab active" onclick="showG('physics','910',this)">9–10th Grade</button>
+    <button class="gtab" onclick="showG('physics','1112',this)">11–12th / AP Physics</button>
+  </div>
+  <div class="gcontent active" id="physics-910">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/science/physics" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fef2f2">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — Physics</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#fef2f2;color:#dc2626">FREE</span></div><div class="rc-body">Kinematics, Newton's laws, energy, waves, electricity, and magnetism — full high school physics.</div></a>
+      <a class="res-card" href="https://phet.colorado.edu/en/simulations/filter?subjects=physics" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fef2f2">🔭</div><div class="rc-info"><div class="rc-name">PhET Physics Simulations</div><div class="rc-url">phet.colorado.edu</div></div><span class="rc-badge" style="background:#fef2f2;color:#dc2626">SIMULATION</span></div><div class="rc-body">Simulate forces, circuits, projectile motion, and waves — free virtual physics lab from University of Colorado.</div></a>
+      <a class="res-card" href="https://www.physicsclassroom.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fef2f2">📘</div><div class="rc-info"><div class="rc-name">The Physics Classroom</div><div class="rc-url">physicsclassroom.com</div></div><span class="rc-badge" style="background:#fef2f2;color:#dc2626">FREE</span></div><div class="rc-body">Tutorials, animations, and practice problems for every high school physics topic — very student-friendly.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="physics-1112">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/science/ap-physics-1" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fef2f2">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — AP Physics 1 &amp; 2</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#fef2f2;color:#dc2626">AP PREP</span></div><div class="rc-body">Full AP Physics 1 and 2 preparation — mechanics, fluids, thermodynamics, electricity, and waves.</div></a>
+      <a class="res-card" href="https://www.flippingphysics.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fef2f2">🎬</div><div class="rc-info"><div class="rc-name">Flipping Physics</div><div class="rc-url">flippingphysics.com</div></div><span class="rc-badge" style="background:#fef2f2;color:#dc2626">VIDEO</span></div><div class="rc-body">Free AP Physics video lessons — kinematics, rotational motion, circuits, and modern physics explained clearly.</div></a>
+    </div>
+  </div>
+</div>
+
+<!-- BIOLOGY -->
+<div class="panel" id="panel-biology">
+  <div class="panel-header"><div class="panel-icon" style="background:#ecfdf5">🧬</div><div><h2 style="color:#059669">Biology</h2><p>Cells, genetics, ecology, evolution, anatomy, and molecular biology</p></div></div>
+  <div class="gtabs">
+    <button class="gtab active" onclick="showG('biology','910',this)">9–10th Grade</button>
+    <button class="gtab" onclick="showG('biology','1112',this)">11–12th / AP Bio</button>
+  </div>
+  <div class="gcontent active" id="biology-910">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/science/biology" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — Biology</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">FREE</span></div><div class="rc-body">Cells, photosynthesis, respiration, genetics, ecology, and evolution — complete high school biology.</div></a>
+      <a class="res-card" href="https://www.hhmi.org/biointeractive" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">🔬</div><div class="rc-info"><div class="rc-name">HHMI BioInteractive</div><div class="rc-url">hhmi.org</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">FREE</span></div><div class="rc-body">Award-winning biology resources — films, animations, data activities, and virtual labs from world-class scientists.</div></a>
+      <a class="res-card" href="https://www.cellsalive.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">🦠</div><div class="rc-info"><div class="rc-name">Cells Alive!</div><div class="rc-url">cellsalive.com</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">INTERACTIVE</span></div><div class="rc-body">Interactive animations of cell division, immune response, and cell structure — great for visual learners.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="biology-1112">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/science/ap-biology" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — AP Biology</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">AP PREP</span></div><div class="rc-body">Complete AP Biology — molecular biology, genetics, evolution, ecology, and systems biology.</div></a>
+      <a class="res-card" href="https://www.ncbi.nlm.nih.gov/books/NBK21054" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#ecfdf5">🏥</div><div class="rc-info"><div class="rc-name">NCBI — Molecular Biology Textbook</div><div class="rc-url">ncbi.nlm.nih.gov</div></div><span class="rc-badge" style="background:#ecfdf5;color:#059669">FREE</span></div><div class="rc-body">Free online molecular biology and genetics textbooks from the National Center for Biotechnology Information.</div></a>
+    </div>
+  </div>
+</div>
+
+<!-- CS -->
+<div class="panel" id="panel-cs">
+  <div class="panel-header"><div class="panel-icon" style="background:#eff6ff">💻</div><div><h2 style="color:#2563eb">Computer Science</h2><p>Coding, algorithms, data structures, and computational thinking</p></div></div>
+  <div class="gtabs">
+    <button class="gtab active" onclick="showG('cs','68',this)">6–8th Grade</button>
+    <button class="gtab" onclick="showG('cs','910',this)">9–10th Grade</button>
+    <button class="gtab" onclick="showG('cs','1112',this)">11–12th / AP CS</button>
+  </div>
+  <div class="gcontent active" id="cs-68">
+    <div class="res-grid">
+      <a class="res-card" href="https://code.org" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">💻</div><div class="rc-info"><div class="rc-name">Code.org</div><div class="rc-url">code.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Free coding courses for all ages — Scratch, block coding, Python, and JavaScript. Perfect for beginners.</div></a>
+      <a class="res-card" href="https://scratch.mit.edu" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🐱</div><div class="rc-info"><div class="rc-name">Scratch — MIT</div><div class="rc-url">scratch.mit.edu</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Create interactive stories, games, and animations using block-based programming. Free from MIT Media Lab.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="cs-910">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/computing/computer-science" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — CS</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Algorithms, cryptography, internet basics, and programming — beginner to intermediate CS concepts.</div></a>
+      <a class="res-card" href="https://www.w3schools.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🌐</div><div class="rc-info"><div class="rc-name">W3Schools</div><div class="rc-url">w3schools.com</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">REFERENCE</span></div><div class="rc-body">Free web development tutorials — HTML, CSS, JavaScript, Python, SQL with interactive try-it editors.</div></a>
+    </div>
+  </div>
+  <div class="gcontent" id="cs-1112">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.khanacademy.org/computing/ap-computer-science-principles" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — AP CS Principles</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">AP PREP</span></div><div class="rc-body">Full AP Computer Science Principles — digital information, the internet, algorithms, and programming.</div></a>
+      <a class="res-card" href="https://cs50.harvard.edu/x" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#eff6ff">🏫</div><div class="rc-info"><div class="rc-name">Harvard CS50</div><div class="rc-url">cs50.harvard.edu</div></div><span class="rc-badge" style="background:#eff6ff;color:#2563eb">FREE</span></div><div class="rc-body">Harvard's legendary intro to computer science — completely free. C, Python, SQL, and web development.</div></a>
+    </div>
+  </div>
+</div>
+
+<!-- CALCULUS -->
+<div class="panel" id="panel-calc">
+  <div class="panel-header"><div class="panel-icon" style="background:#fff1f2">∫</div><div><h2 style="color:#e11d48">Calculus</h2><p>Limits, derivatives, integrals — AP Calculus AB and BC preparation</p></div></div>
+  <div class="res-grid">
+    <a class="res-card" href="https://www.khanacademy.org/math/calculus-1" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fff1f2">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — Calculus I (AP AB)</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#fff1f2;color:#e11d48">FREE</span></div><div class="rc-body">Limits, derivatives, and integration — full AP Calculus AB curriculum with video lessons and exercises.</div></a>
+    <a class="res-card" href="https://www.khanacademy.org/math/calculus-2" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fff1f2">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — Calculus II (AP BC)</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#fff1f2;color:#e11d48">FREE</span></div><div class="rc-body">Integration techniques, series, and parametric equations — AP Calculus BC content fully covered.</div></a>
+    <a class="res-card" href="https://www.paul.math.lamar.edu/Classes/CalcI/CalcI.aspx" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fff1f2">📘</div><div class="rc-info"><div class="rc-name">Paul's Online Calculus Notes</div><div class="rc-url">paul.math.lamar.edu</div></div><span class="rc-badge" style="background:#fff1f2;color:#e11d48">REFERENCE</span></div><div class="rc-body">The most comprehensive free calculus notes available — used by millions of AP and college students.</div></a>
+    <a class="res-card" href="https://www.3blue1brown.com/topics/calculus" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fff1f2">🎬</div><div class="rc-info"><div class="rc-name">3Blue1Brown — Essence of Calculus</div><div class="rc-url">3blue1brown.com</div></div><span class="rc-badge" style="background:#fff1f2;color:#e11d48">VIDEO</span></div><div class="rc-body">Visual, intuitive explanations of why calculus works — the best series for deep conceptual understanding.</div></a>
+    <a class="res-card" href="https://www.wolframalpha.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fff1f2">🧮</div><div class="rc-info"><div class="rc-name">Wolfram Alpha — Calculus Solver</div><div class="rc-url">wolframalpha.com</div></div><span class="rc-badge" style="background:#fff1f2;color:#e11d48">SOLVER</span></div><div class="rc-body">Compute derivatives, integrals, limits, and series with step-by-step solutions. Most powerful free math engine.</div></a>
+  </div>
+</div>
+
+<!-- ARTS -->
+<div class="panel" id="panel-art">
+  <div class="panel-header"><div class="panel-icon" style="background:#f5f3ff">🎨</div><div><h2 style="color:#7c3aed">Arts &amp; Music</h2><p>Visual arts, music theory, performance, and creative resources</p></div></div>
+  <div class="res-grid">
+    <a class="res-card" href="https://www.musictheory.net" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#f5f3ff">🎵</div><div class="rc-info"><div class="rc-name">MusicTheory.net</div><div class="rc-url">musictheory.net</div></div><span class="rc-badge" style="background:#f5f3ff;color:#7c3aed">FREE</span></div><div class="rc-body">Free interactive music theory lessons — notes, intervals, scales, chords, rhythm, and ear training.</div></a>
+    <a class="res-card" href="https://www.khanacademy.org/humanities/art-history" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#f5f3ff">🎓</div><div class="rc-info"><div class="rc-name">Khan Academy — Art History</div><div class="rc-url">khanacademy.org</div></div><span class="rc-badge" style="background:#f5f3ff;color:#7c3aed">FREE</span></div><div class="rc-body">Art history from ancient to contemporary — video tours of major works, movements, and periods.</div></a>
+    <a class="res-card" href="https://artsandculture.google.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#f5f3ff">🖼️</div><div class="rc-info"><div class="rc-name">Google Arts &amp; Culture</div><div class="rc-url">artsandculture.google.com</div></div><span class="rc-badge" style="background:#f5f3ff;color:#7c3aed">FREE</span></div><div class="rc-body">Virtual museum tours and high-resolution artwork from 2,000+ museums worldwide — completely free.</div></a>
+    <a class="res-card" href="https://www.teoria.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#f5f3ff">🎹</div><div class="rc-info"><div class="rc-name">Teoría — Music Theory Exercises</div><div class="rc-url">teoria.com</div></div><span class="rc-badge" style="background:#f5f3ff;color:#7c3aed">FREE</span></div><div class="rc-body">Music theory tutorials and exercises — intervals, scales, chords, ear training, and sight reading practice.</div></a>
+  </div>
+</div>
+
+<!-- STUDY TOOLS -->
+<div class="panel" id="panel-tools">
+  <div class="panel-header"><div class="panel-icon" style="background:#fffbeb">🛠️</div><div><h2 style="color:#d97706">Study Tools</h2><p>Flashcards, note-taking, citation generators, calculators, and productivity apps</p></div></div>
+  <div class="res-grid">
+    <a class="res-card" href="https://quizlet.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">📇</div><div class="rc-info"><div class="rc-name">Quizlet</div><div class="rc-url">quizlet.com</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">FREE</span></div><div class="rc-body">Flashcards, games, and practice tests — create your own or use millions of existing sets for any subject.</div></a>
+    <a class="res-card" href="https://www.desmos.com/scientific" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">🧮</div><div class="rc-info"><div class="rc-name">Desmos Scientific Calculator</div><div class="rc-url">desmos.com</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">TOOL</span></div><div class="rc-body">Free online scientific calculator — trig, logarithms, exponents, and more. No download required.</div></a>
+    <a class="res-card" href="https://www.easybib.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">📎</div><div class="rc-info"><div class="rc-name">EasyBib Citation Generator</div><div class="rc-url">easybib.com</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">TOOL</span></div><div class="rc-body">Automatic MLA, APA, and Chicago citation generator — books, websites, articles in seconds.</div></a>
+    <a class="res-card" href="https://docs.google.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">📄</div><div class="rc-info"><div class="rc-name">Google Docs</div><div class="rc-url">docs.google.com</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">FREE</span></div><div class="rc-body">Free word processing with real-time collaboration, cloud saving, and formatting tools for essays and reports.</div></a>
+    <a class="res-card" href="https://www.wolframalpha.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">🧠</div><div class="rc-info"><div class="rc-name">Wolfram Alpha</div><div class="rc-url">wolframalpha.com</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">SOLVER</span></div><div class="rc-body">Computational knowledge engine — solves math, answers science questions, and provides data on any topic.</div></a>
+    <a class="res-card" href="https://www.gutenberg.org" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">📚</div><div class="rc-info"><div class="rc-name">Project Gutenberg</div><div class="rc-url">gutenberg.org</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">FREE</span></div><div class="rc-body">Free downloads of 70,000+ public domain books — classic literature, historical texts, and reference works.</div></a>
+    <a class="res-card" href="https://translate.google.com" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">🌐</div><div class="rc-info"><div class="rc-name">Google Translate</div><div class="rc-url">translate.google.com</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">TOOL</span></div><div class="rc-body">Instant translation between 130+ languages — helpful for ELL students and world language classes.</div></a>
+    <a class="res-card" href="https://www.wikipedia.org" target="_blank"><div class="rc-top"><div class="rc-favicon" style="background:#fffbeb">📖</div><div class="rc-info"><div class="rc-name">Wikipedia</div><div class="rc-url">wikipedia.org</div></div><span class="rc-badge" style="background:#fffbeb;color:#d97706">REFERENCE</span></div><div class="rc-body">Free encyclopedia — good starting point for any topic. Always verify with additional primary sources.</div></a>
+  </div>
+</div>
+
+  </main>
+</div>
+
+<!-- SECRET OVERLAY -->
+<div class="secret-overlay" id="secret-overlay" onclick="outsideClose(event)">
+  <div class="secret-modal">
+    <button class="sm-close" onclick="closeSecret()">&#x2715; close</button>
+    <div class="sm-eyebrow">// restricted access //</div>
+    <div class="sm-title">b.rowser</div>
+    <div id="sm-auth">
+      <div class="sm-input-wrap">
+        <label class="sm-label">Access Code</label>
+        <input class="sm-input" id="sm-code" type="password" placeholder="enter code&#x2026;" onkeydown="if(event.key==='Enter')checkCode()">
+      </div>
+      <div class="sm-error" id="sm-error"></div>
+      <button class="sm-btn" onclick="checkCode()">UNLOCK &#x2192;</button>
+    </div>
+    <div id="sm-links" style="display:none">
+      <div class="sm-links-label">// Internal Access //</div>
+      <a class="sm-link" href="browser_home.html">&#x27F6; &nbsp; OPEN b.rowser</a>
+      <a class="sm-link blue" href="quickplay.html">&#x26A1; &nbsp; QUICKPLAY!</a>
+      <a class="sm-link green" href="cheats_menu.html">&#x26A1; &nbsp; CHEAT CODES</a>
+    </div>
+    <div class="sm-footer">&#x2B21; &nbsp; MAGNUM INDUSTRIES &nbsp;&middot;&nbsp; INTERNAL ONLY</div>
+  </div>
+</div>
+
+<script>
+function showPanel(id){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.subj-btn').forEach(b=>b.classList.remove('active'));document.getElementById('panel-'+id).classList.add('active');const btn=document.querySelector('[data-p="'+id+'"]');if(btn)btn.classList.add('active');}
+function showG(subj,grade,btn){const panel=btn?btn.closest('.panel'):document.getElementById('panel-'+subj);if(!panel)return;panel.querySelectorAll('.gcontent').forEach(c=>c.classList.remove('active'));panel.querySelectorAll('.gtab').forEach(t=>t.classList.remove('active'));const target=document.getElementById(subj+'-'+grade);if(target)target.classList.add('active');if(btn)btn.classList.add('active');}
+function quickGrade(g,chip){document.querySelectorAll('.gchip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');if(g==='all')return;const active=document.querySelector('.panel.active');if(!active)return;active.querySelectorAll('.gtab').forEach(t=>{const oc=t.getAttribute('onclick')||'';if(oc.includes("'"+g+"'"))t.click();});}
+function doSearch(q){
+  const res=document.getElementById('search-results');
+  const label=document.getElementById('sr-label');
+  const hits=document.getElementById('sr-hits');
+  if(!q.trim()){res.classList.remove('show');return;}
+  if(q.trim().toLowerCase()==='b.rowser'){res.classList.remove('show');document.getElementById('gsearch').value='';openSecret();return;}
+  const query=q.toLowerCase();
+  const found=[];
+  document.querySelectorAll('.res-card').forEach(card=>{
+    if(card.textContent.toLowerCase().includes(query)){
+      const name=card.querySelector('.rc-name')?.textContent||'';
+      const url=card.querySelector('.rc-url')?.textContent||'';
+      const desc=card.querySelector('.rc-body')?.textContent||'';
+      const href=card.getAttribute('href')||'#';
+      const panel=card.closest('.panel');
+      const subj=panel?panel.querySelector('h2')?.textContent:'';
+      found.push({name,url,desc,href,subj});
+    }
+  });
+  res.classList.add('show');
+  const hl=s=>s.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
+  label.textContent=found.length+' result'+(found.length!==1?'s':'')+' for "'+q+'"';
+  if(!found.length){hits.innerHTML='<p style="font-size:.82rem;color:var(--text3);padding:4px 0">No resources found.</p>';return;}
+  hits.innerHTML=found.slice(0,16).map(r=>'<a class="sr-hit" href="'+r.href+'" target="_blank"><div class="sr-hit-title">'+r.name+'</div><div class="sr-hit-url">'+r.url+'</div><div class="sr-hit-meta">'+r.subj+'</div></a>').join('');
+}
+function openSecret(){document.getElementById('sm-auth').style.display='block';document.getElementById('sm-links').style.display='none';document.getElementById('sm-error').textContent='';document.getElementById('sm-code').value='';document.getElementById('secret-overlay').classList.add('open');setTimeout(()=>document.getElementById('sm-code').focus(),150);}
+function closeSecret(){document.getElementById('secret-overlay').classList.remove('open');}
+function outsideClose(e){if(e.target===document.getElementById('secret-overlay'))closeSecret();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSecret();});
+function checkCode(){
+  const val=document.getElementById('sm-code').value.trim();
+  const err=document.getElementById('sm-error');
+  if(val.toLowerCase()==='magnum'){
+    document.getElementById('sm-auth').style.display='none';
+    document.getElementById('sm-links').style.display='block';
+  }else{
+    err.textContent='Incorrect access code.';
+    err.classList.remove('shake');void err.offsetWidth;err.classList.add('shake');
+    document.getElementById('sm-code').value='';document.getElementById('sm-code').focus();
+  }
+}
+</script>
+</body>
+</html>
